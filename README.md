@@ -6,4 +6,6 @@ Content is maintained on [github](github.com/dkirkby/MachineLearningStatistics) 
 
 [Table of contents](notebooks/Contents.ipynb)
 
+The notebooks contain exercises but you will need to enable the [exercise2 extension](https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/exercise2) to hide the solutions while you work on them, as described in the [setup instructions](notebooks/Setup.ipynb). All solutions are visible if you view notebooks on github.
+
 Instructors are welcome to contact dkirkby at uci.edu for access to additional material or to discuss collaboration.
