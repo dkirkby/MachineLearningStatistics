@@ -54,3 +54,79 @@ def plot_rosenbrock(xrange=(-1.5, 1.5), yrange=(-0.5,1.5), ngrid=500,
     plt.xlim(*xrange)
     plt.ylim(*yrange)
     return xrange, yrange
+
+
+def plot_posterior(D, mu_range=(-0.5,0.5), sigma_range=(0.7,1.5), ngrid=100,
+                   path=None, VI=None, MC=None):
+    """Plot a posterior with optional algorithm results superimposed.
+
+    Assumes a Gaussian likelihood with parameters (mu, sigma) and flat
+    priors in mu and t=log(sigma).
+
+    Parameters
+    ----------
+    D : array
+        Dataset to use for the true posterior.
+    mu_range : tuple
+        Limits (lo, hi) of mu to plot
+    sigma_range : tuple
+        Limits (lo, hi) of sigma to plot.
+    ngrid : int
+        Number of grid points to use for tabulating the true posterior.
+    path : array or None
+        An array of shape (npath, 2) giving the path used to find the MAP.
+    VI : array or None
+        Values of the variational parameters (s0, s1, s2, s3) to use to
+        display the closest variational approximation.
+    MC : tuple
+        Tuple (mu, sigma) of 1D arrays with the same length, consisting of
+        MCMC samples of the posterior to display.
+    """
+    # Create a grid covering the (mu, sigma) parameter space.
+    mu = np.linspace(*mu_range, ngrid)
+    sigma = np.linspace(*sigma_range, ngrid)
+    sigma_ = sigma[:, np.newaxis]
+    log_sigma_ = np.log(sigma_)
+
+    # Calculate the true -log(posterior) up to a constant.
+    NLL = np.sum(0.5 * (D[:, np.newaxis, np.newaxis] - mu) ** 2 / sigma_** 2 +
+                 log_sigma_, axis=0)
+    # Apply uniform priors on mu and log(sigma)
+    NLP = NLL - log_sigma_
+    NLP -= np.min(NLP)
+
+    if VI is not None:
+        s0, s1, s2, s3 = VI
+        # Calculate the VI approximate -log(posterior) up to a constant.
+        NLQ = (0.5 * (mu - s0) ** 2 / np.exp(s1) ** 2 +
+               0.5 * (log_sigma_ - s2) ** 2 / np.exp(s3) ** 2)
+        NLQ -= np.min(NLQ)
+
+    fig = plt.figure(figsize=(8, 6))
+    plt.imshow(NLP, origin='lower', extent=[*mu_range, *sigma_range],
+               cmap='viridis_r', aspect='auto', vmax=16)
+    c = plt.contour(mu, sigma, NLP, levels=[1, 2, 4, 8],
+                    colors='w', linewidths=1, linestyles='-')
+    plt.clabel(c, inline=1, fontsize=10, fmt='%.0g')
+    plt.plot([], [], 'w-', label='true posterior')
+    if path is not None:
+        plt.scatter(*np.array(path).T, lw=0, s=15, c='r')
+        plt.plot(*np.array(path).T, lw=0.5, c='r', label='MAP optimization')
+        plt.scatter(*path[0], marker='x', s=250, c='r')
+    if VI is not None:
+        plt.contour(mu, sigma, NLQ, levels=[1, 2, 4, 8],
+                    colors='r', linewidths=2, linestyles='--')
+        plt.plot([], [], 'r--', label='VI approximation')
+    if MC is not None:
+        mu, sigma = MC
+        plt.scatter(mu, sigma, s=15, alpha=0.8, zorder=10, lw=0, c='r',
+                    label='MC samples')
+    l = plt.legend(ncol=3, loc='upper center')
+    plt.setp(l.get_texts(), color='w', fontsize='x-large')
+    plt.axhline(1, c='gray', lw=1, ls='--')
+    plt.axvline(0, c='gray', lw=1, ls='--')
+    plt.grid('off')
+    plt.xlabel('Offset parameter $\mu$')
+    plt.ylabel('Scale parameter $\sigma$')
+    plt.xlim(*mu_range)
+    plt.ylim(*sigma_range)

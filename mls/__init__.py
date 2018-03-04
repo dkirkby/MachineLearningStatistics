@@ -4,4 +4,4 @@ from .bayes import Learn
 from .mcmc import MCMC_sample
 from .stochastic import StochasticProcess
 from .variational import plot_KL, plot_ELBO
-from .optimize import plot_rosenbrock
+from .optimize import plot_rosenbrock, plot_posterior
