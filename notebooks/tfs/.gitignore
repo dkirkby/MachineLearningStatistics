@@ -1,1 +1,2 @@
-events.out.tfevents.*
+*
+!.gitignore
