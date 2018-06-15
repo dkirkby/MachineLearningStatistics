@@ -10,4 +10,4 @@ The notebooks contain exercises but you will need to enable the [exercise2 exten
 
 Instructors are welcome to contact dkirkby at uci.edu for access to additional material or to discuss collaboration.
 
-[![license](https://img.shields.io/github/license/dkirkby/MachineLearningStatistics.svg)]() [![nbviewer](https://img.shields.io/badge/view%20on-nbviewer-brightgreen.svg)](http://nbviewer.jupyter.org/github/dkirkby/MachineLearningStatistics/tree/master/notebooks/)
+[![license](https://img.shields.io/github/license/dkirkby/MachineLearningStatistics.svg)]() [![nbviewer](https://img.shields.io/badge/view%20on-nbviewer-brightgreen.svg)](http://nbviewer.jupyter.org/github/dkirkby/MachineLearningStatistics/tree/master/notebooks/Contents.ipynb)
