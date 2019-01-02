@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='mls',
-    version='0.1',
+    version='0.2',
     description='Material for UCI course "ML & Statistics for Physicists"',
     url='http://github.com/dkirkby/MachineLearningStatistics',
     author='David Kirkby',
