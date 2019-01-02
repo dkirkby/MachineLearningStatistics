@@ -1,0 +1,27 @@
+## Conda environment for a UC Irvine course on Machine Learning & Statistics.
+## Details at:
+## https://nbviewer.jupyter.org/github/dkirkby/MachineLearningStatistics/blob/master/notebooks/Setup.ipynb
+
+name: MLS
+channels:
+  - anaconda
+  - conda-forge   # needed for jupyterlab, jupyter_contrib_nbextensions, emcee
+dependencies:
+  - python=3.6    # tensorflow does not support 3.7 yet
+  - pip           # ensures that any pip installs only modify this env
+  - ipython
+  - jupyter
+  - jupyterlab    # needed for "jupyter lab"
+  - ipykernel     # ensures that (base) nb_conda creates a kernel for this env
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - hdf5
+  - pytables
+  - pillow
+  - libiconv       # needed by jupyter_contrib_nbextensions on some platforms
+  - jupyter_contrib_nbextensions
+  - emcee
