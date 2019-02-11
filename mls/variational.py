@@ -208,7 +208,7 @@ def plot_ELBO(q, q_scale_range, likelihood, prior, theta_range, n_data, seed=123
     ax[2].legend(loc='upper center', fontsize='x-large')
 
     x_lim = 1.1 * np.max(np.abs(D))
-    ax[3].hist(D, normed=True, range=(-x_lim, +x_lim), histtype='stepfilled')
+    ax[3].hist(D, density=True, range=(-x_lim, +x_lim), histtype='stepfilled')
     x = np.linspace(-x_lim, +x_lim, 250)
     dtheta = 0.25 * (theta[-1] - theta[0])
     for theta, ls in zip(

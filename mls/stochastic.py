@@ -116,7 +116,7 @@ class StochasticProcess(object):
                 for k in range(nsteps):
                     history.append(self.update(history, self.gen))
                 Xj.append(history[-1])
-            result[i], _ = np.histogram(Xj, bins, normed=True)
+            result[i], _ = np.histogram(Xj, bins, density=True)
         result *= (hi - lo) / nbins
         assert np.allclose(result.sum(axis=1), 1)
         return bins, result
@@ -154,7 +154,7 @@ class StochasticProcess(object):
             ax.plot(mean, xy , 'b-')
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.grid('off')
+        ax.grid(False)
 
     def plot_conditionals(self, lo=0., hi=1., nbins=50, nruns=2000,
                           which=(1, 2, 3)):
