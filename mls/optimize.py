@@ -41,7 +41,7 @@ def plot_rosenbrock(xrange=(-1.5, 1.5), yrange=(-0.5,1.5), ngrid=500,
     plt.clabel(c, inline=1, fontsize=10, fmt='%.0g')
     plt.axhline(1, c='gray', lw=1, ls='--')
     plt.axvline(1, c='gray', lw=1, ls='--')
-    plt.grid('off')
+    plt.grid(False)
     plt.xlabel('$x_0$')
     plt.ylabel('$x_1$')
     if all_calls:
@@ -125,7 +125,7 @@ def plot_posterior(D, mu_range=(-0.5,0.5), sigma_range=(0.7,1.5), ngrid=100,
     plt.setp(l.get_texts(), color='w', fontsize='x-large')
     plt.axhline(1, c='gray', lw=1, ls='--')
     plt.axvline(0, c='gray', lw=1, ls='--')
-    plt.grid('off')
+    plt.grid(False)
     plt.xlabel('Offset parameter $\mu$')
     plt.ylabel('Scale parameter $\sigma$')
     plt.xlim(*mu_range)
