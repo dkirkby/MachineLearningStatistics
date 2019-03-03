@@ -20,11 +20,11 @@ def nn_map2d(fx, params=None, x_range=3, ax=None, vlim=None, label=None):
         w = np.asarray(w)
         x0 = -b * w / np.dot(w, w)
         ax.annotate('', xy=x0 + w, xytext=x0,
-                    arrowprops=dict(arrowstyle='->', lw=3))
+                    arrowprops=dict(arrowstyle='->', lw=3, color='k'))
     if label:
         ax.text(0.5, 0.9, label, horizontalalignment='center',
                 color='k', fontsize=16, transform=ax.transAxes)
-    ax.grid('off')
+    ax.grid(False)
     ax.axis('off')
 
 
