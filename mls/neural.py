@@ -28,21 +28,22 @@ def nn_map2d(fx, params=None, x_range=3, ax=None, vlim=None, label=None):
     ax.axis('off')
 
 
-def nn_unit_draw2d(w, b, phi, x_range=3, ax=None, vlim=None, label=None):
+def nn_unit_draw2d(w, b, phi, x_range=3, nx=250, ax=None, vlim=None, label=None):
     """Draw a single network unit or layer with 2D input.
 
     Parameters
     ----------
     w : array
-        1D (unit) or 2D (layer) array of weight values to use.
+        1D array of weight values to use.
     b : float or array
         scalar (unit) or 1D array (layer) of bias values to use.
     phi : callable
         Activation function to use.
     """
-    x_i = np.linspace(-x_range, +x_range, 250)
-    x = np.stack(np.meshgrid(x_i, x_i), axis=1)
-    fx = phi(np.dot(w, x) + b)
+    x_i = np.linspace(-x_range, +x_range, nx)
+    X = np.stack(np.meshgrid(x_i, x_i), axis=2).reshape(nx ** 2, 2)
+    W = np.asarray(w).reshape(2, 1)
+    fx = phi(np.dot(X, W) + b).reshape(nx, nx)
     nn_map2d(fx, (w, b), x_range, ax, vlim, label)
 
 
@@ -61,19 +62,19 @@ def nn_graph_draw2d(*layers, x_range=3, label=None, n_grid=250, n_bins=25):
     depth = len(layers)
     n_max, vlim = 0, 0.
     for i, (W, b, phi) in enumerate(layers):
-        W = np.asarray(W)
+        WT = np.asarray(W).T
         b = np.asarray(b)
-        n_out, n_in = W.shape
+        n_out, n_in = WT.shape
         n_max = max(n_max, n_out)
         if layer_in.shape != (n_in, n_grid ** 2):
             raise ValueError(
-                'LYR{}: number of columns in W ({}) does not match layer input size ({}).'
+                'LYR{}: number of rows in W ({}) does not match layer input size ({}).'
                 .format(i + 1, n_in, layer_in.shape))
         if b.shape != (n_out,):
             raise ValueError(
-                'LYR{}: number of rows in W ({}) does not match size of b ({}).'
+                'LYR{}: number of columns in W ({}) does not match size of b ({}).'
                 .format(i + 1, n_out, b.shape))
-        s = np.dot(W, layer_in) + b.reshape(-1, 1)
+        s = np.dot(WT, layer_in) + b.reshape(-1, 1)
         layer_s.append(s)
         layer_out.append(phi(s))
         layer_in = layer_out[-1]
@@ -81,12 +82,13 @@ def nn_graph_draw2d(*layers, x_range=3, label=None, n_grid=250, n_bins=25):
     _, ax = plt.subplots(n_max, depth, figsize=(3 * depth, 3 * n_max),
                          sharex=True, sharey=True, squeeze=False)
     for i, (W, b, phi) in enumerate(layers):
+        W = np.asarray(W)
         for j in range(n_max):
             if j >= len(layer_out[i]):
                 ax[j, i].axis('off')
                 continue
             label = 'LYR{}-NODE{}'.format(i + 1, j + 1)
-            params = (W[j], b[j]) if i == 0 else None
+            params = (W[:,j], b[j]) if i == 0 else None
             fx = layer_out[i][j]
             nn_map2d(fx.reshape(n_grid, n_grid), params=params,
                       ax=ax[j, i], vlim=vlim, x_range=x_range, label=label)
