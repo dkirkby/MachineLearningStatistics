@@ -2,6 +2,9 @@
 'ML & Statistics for Physicists'
 """
 import functools
+import copy
+
+import numpy as np
 
 import torch.nn
 
@@ -79,3 +82,65 @@ def trace(module, active=True, verbose=False):
             functools.partial(trace_forward, name=name, verbose=verbose)))
         module._trace_hooks.append(submodule.register_backward_hook(
             functools.partial(trace_backward, name=name, verbose=verbose)))
+
+
+def get_lr(self, name='lr'):
+    lr_grps = [grp for grp in self.param_groups if name in grp]
+    if not lr_grps:
+        raise ValueError(f'Optimizer has no parameter called "{name}".')
+    if len(lr_grps) > 1:
+        raise ValueError(f'Optimizer has multiple parameters called "{name}".')
+    return lr_grps[0][name]
+
+def set_lr(self, value, name='lr'):
+    lr_grps = [grp for grp in self.param_groups if name in grp]
+    if not lr_grps:
+        raise ValueError(f'Optimizer has no parameter called "{name}".')
+    if len(lr_grps) > 1:
+        raise ValueError(f'Optimizer has multiple parameters called "{name}".')
+    lr_grps[0][name] = value    
+
+# Add get_lr, set_lr methods to all Optimizer subclasses.
+torch.optim.Optimizer.get_lr = get_lr
+torch.optim.Optimizer.set_lr = set_lr
+
+
+def lr_scan(loader, model, loss_fn, optimizer, lr_start=1e-6, lr_stop=1., lr_steps=100):
+    """Implement the learning-rate scan described in Smith 2015.
+    """
+    import matplotlib.pyplot as plt
+    # Save the model and optimizer states before scanning.
+    model_save = copy.deepcopy(model.state_dict())
+    optim_save = copy.deepcopy(optimizer.state_dict())
+    # Schedule learning rate to increase in logarithmic steps.
+    lr_schedule = np.logspace(np.log10(lr_start), np.log10(lr_stop), lr_steps)
+    model.train()
+    losses = []
+    scanning = True
+    while scanning:
+        for x_in, y_tgt in loader:
+            optimizer.set_lr(lr_schedule[len(losses)])
+            y_pred = model(x_in)
+            loss = loss_fn(y_pred, y_tgt)
+            losses.append(loss.data)
+            if len(losses) == lr_steps or losses[-1] > 10 * losses[0]:
+                scanning = False
+                break
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    # Restore the model and optimizer state.
+    model.load_state_dict(model_save)
+    optimizer.load_state_dict(optim_save)
+    # Plot the scan results.
+    plt.plot(lr_schedule[:len(losses)], losses, '.')
+    plt.ylim(0.5 * np.min(losses), 10 * losses[0])
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.xlabel('Learning rate')
+    plt.ylabel('Loss')
+    # Return an optimizer with set_lr/get_lr methods, and lr set to half of the best value found.
+    idx = np.argmin(losses)
+    lr_set = 0.5 * lr_schedule[idx]
+    print(f'Recommended lr={lr_set:.3g}.')
+    optimizer.set_lr(lr_set)
