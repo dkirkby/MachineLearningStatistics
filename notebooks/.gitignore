@@ -4,3 +4,8 @@ pong_data.tsv
 
 # Template for creating new notebooks
 TEMPLATE.ipynb
+
+# Temporary files.
+*.pth
+*.dot
+*.png
