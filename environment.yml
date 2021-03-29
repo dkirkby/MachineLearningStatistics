@@ -7,7 +7,7 @@ channels:
   - anaconda
   - conda-forge   # needed for jupyterlab, jupyter_contrib_nbextensions, emcee
 dependencies:
-  - python=3.7    # tensorflow does not support 3.8 yet
+  - python=3.8    # conda default as of Apr 2021
   - pip           # ensures that any pip installs only modify this env
   - ipython
   - jupyter
